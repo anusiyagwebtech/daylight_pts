@@ -1,0 +1,1229 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daylight — Daily Tasks</title>
+
+  <style>
+    :root {
+      --bg: #f7f7fb;
+      --card: #ffffff;
+      --text: #242439;
+      --muted: #85859a;
+      --accent: #7868e8;
+      --accent-light: #eeeaff;
+      --green: #23865b;
+      --border: #e9e8f0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      width: min(100% - 32px, 680px);
+      margin: 0 auto;
+      padding: 38px 0 60px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 34px;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .brand span { color: var(--accent); }
+
+    .date {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
+
+    .hero { margin-bottom: 25px; }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(30px, 7vw, 42px);
+      letter-spacing: -1.7px;
+      margin: 9px 0;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .extra-progress {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .metric-progress {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .metric-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 11px;
+    }
+
+    .metric-value {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      margin-bottom: 10px;
+    }
+
+    .metric-track {
+      height: 7px;
+      background: #eeedf4;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .metric-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #9284f5, #6654db);
+      border-radius: inherit;
+      transition: width .35s ease;
+    }
+
+    .metric-note {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+      margin-top: 9px;
+    }
+
+    .report-progress {
+      margin-top: 18px;
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #faf9fd;
+    }
+
+    .report-progress .metric-heading {
+      margin-bottom: 8px;
+    }
+
+    .report-progress .metric-value {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 14px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+
+    .progress-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 18px;
+      margin-bottom: 28px;
+    }
+
+    .progress-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 13px;
+    }
+
+    .muted { color: var(--muted); font-weight: 400; }
+
+    .progress-track {
+      height: 8px;
+      background: #eeedf4;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #9284f5, #6654db);
+      border-radius: inherit;
+      transition: width .35s ease;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-size: 17px;
+      margin: 0;
+      letter-spacing: -.4px;
+    }
+
+    .count {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      transition: opacity .25s, border-color .25s,
+                  box-shadow .25s, transform .25s;
+    }
+
+    .task.active {
+      border-color: #a69aff;
+      box-shadow: 0 0 0 3px #7868e818,
+                  0 5px 22px #7868e815;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 0 2px #7868e812; }
+      to { box-shadow: 0 0 0 4px #7868e82b,
+                         0 5px 24px #7868e820; }
+    }
+
+    .task.completed {
+      opacity: .46;
+      background: #f2f2f6;
+      box-shadow: none;
+      animation: none;
+    }
+
+    .task.completed .task-name {
+      text-decoration: line-through;
+    }
+
+    .task-number {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      border-radius: 11px;
+      background: #f0eefb;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .task.completed .task-number {
+      background: #e0e9e3;
+      color: var(--green);
+    }
+
+    .task-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .task-name {
+      font-size: 14px;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+      line-height: 1.5;
+    }
+
+    .task-note {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .small-btn {
+      border: 0;
+      border-radius: 9px;
+      padding: 8px;
+      background: #f3f2f8;
+      color: #6f6d85;
+      font-size: 12px;
+    }
+
+    .small-btn:hover { background: var(--accent-light); }
+
+    .task.completed .small-btn.complete-btn { display: none; }
+
+    .add-area {
+      margin-top: 18px;
+      padding: 18px;
+      background: var(--card);
+      border: 1px dashed #d5d1e8;
+      border-radius: 16px;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 9px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      min-width: 0;
+      padding: 13px 14px;
+      background: #faf9fd;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    .primary-btn {
+      border: 0;
+      padding: 12px 17px;
+      border-radius: 11px;
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .primary-btn:hover { background: #6756d8; }
+
+    .primary-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .hint {
+      margin: 11px 2px 0;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .bottom-note {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: #1d193b77;
+      backdrop-filter: blur(5px);
+    }
+
+    .overlay.show { display: grid; }
+
+    .modal {
+      width: min(100%, 410px);
+      padding: 27px;
+      background: white;
+      border-radius: 23px;
+      box-shadow: 0 20px 80px #17132c30;
+      animation: appear .2s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-icon {
+      width: 47px;
+      height: 47px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: var(--accent-light);
+      font-size: 23px;
+      margin-bottom: 18px;
+    }
+
+    .modal h2 {
+      font-size: 23px;
+      margin-bottom: 9px;
+    }
+
+    .modal p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .satisfaction-label {
+      font-size: 13px;
+      font-weight: 700;
+      margin: 22px 0 12px;
+    }
+
+    .rating-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .rating {
+      flex: 1;
+      padding: 12px 0;
+      background: #f5f4fa;
+      border: 1px solid transparent;
+      border-radius: 11px;
+      font-size: 19px;
+    }
+
+    .rating.selected {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .rating-caption {
+      text-align: center;
+      min-height: 20px;
+      font-size: 12px;
+      color: var(--accent);
+      margin-top: 10px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 9px;
+      margin-top: 23px;
+    }
+
+    .modal-actions button { flex: 1; }
+
+    .secondary-btn {
+      padding: 12px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 11px;
+      color: #5c5a70;
+      font-weight: 650;
+    }
+
+    .rank {
+      font-size: 54px;
+      font-weight: 900;
+      letter-spacing: -3px;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+
+    .report-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .report-line span { color: var(--muted); }
+    .report-line strong { text-align: right; }
+
+    .empty {
+      text-align: center;
+      padding: 35px 15px;
+      color: var(--muted);
+      background: white;
+      border: 1px dashed var(--border);
+      border-radius: 15px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    @media (max-width: 450px) {
+      .app { padding-top: 25px; }
+      .stats { gap: 7px; }
+      .extra-progress { grid-template-columns: 1fr; }
+      .stat { padding: 14px 10px; }
+      .stat-value { font-size: 21px; }
+      .task { padding: 12px; gap: 9px; }
+      .task-actions { gap: 3px; }
+      .small-btn { padding: 7px; }
+      .add-row { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header class="top">
+      <div class="brand">day<span>light.</span></div>
+      <div class="date" id="dateDisplay"></div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">A fresh start, every day</div>
+      <h1>Make today count.</h1>
+      <div class="subtitle" id="motivation">
+        One task at a time. Your progress is worth celebrating.
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value" id="completedStat">0/15</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Performance</div>
+        <div class="stat-value" id="scoreStat">0%</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Satisfaction</div>
+        <div class="stat-value" id="satisfactionStat">—</div>
+      </div>
+    </section>
+
+    <section class="progress-card">
+      <div class="progress-heading">
+        <span>Your daily progress</span>
+        <span class="muted" id="progressText">0% complete</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </section>
+
+    <section class="extra-progress" aria-label="Rating points and study-time progress">
+      <div class="metric-progress">
+        <div class="metric-heading">
+          <span>Rating points</span>
+          <span class="muted" id="pointsProgressText">0 / 75</span>
+        </div>
+        <div class="metric-value" id="pointsValue">0 / 75 pts</div>
+        <div class="metric-track" role="progressbar" aria-label="Rating points progress"
+          aria-valuemin="0" aria-valuemax="75" aria-valuenow="0" id="pointsProgressBar">
+          <div class="metric-fill" id="pointsProgressFill"></div>
+        </div>
+        <div class="metric-note">Earn up to 5 points for each of 15 tasks.</div>
+      </div>
+      <div class="metric-progress">
+        <div class="metric-heading">
+          <span>Study-time equivalent</span>
+          <span class="muted" id="studyProgressText">0%</span>
+        </div>
+        <div class="metric-value" id="studyTimeValue">0 min / 12.5 hrs</div>
+        <div class="metric-track" role="progressbar" aria-label="Study-time equivalent progress"
+          aria-valuemin="0" aria-valuemax="750" aria-valuenow="0" id="studyProgressBar">
+          <div class="metric-fill" id="studyProgressFill"></div>
+        </div>
+        <div class="metric-note">Each rating point represents 10 minutes, up to 750 minutes (12.5 hours).</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Today's tasks</h2>
+        <span class="count" id="taskCount">0 of 15 tasks</span>
+      </div>
+
+      <div class="task-list" id="taskList"></div>
+
+      <div class="add-area">
+        <form class="add-row" id="addForm">
+          <input
+            id="taskInput"
+            type="text"
+            maxlength="140"
+            placeholder="What would you like to achieve?"
+            autocomplete="off"
+            aria-label="New task"
+          >
+          <button class="primary-btn" id="addBtn" type="submit">
+            + Add task
+          </button>
+        </form>
+        <div class="hint" id="addHint">
+          Up to 15 tasks a day. Keep it meaningful.
+        </div>
+      </div>
+    </section>
+
+    <div class="bottom-note">
+      Your pace. Your progress. Your day.<br>
+      Daily results at 10:00 PM · Fresh start at 10:05 PM
+    </div>
+  </main>
+
+  <!-- Completion confirmation -->
+  <div class="overlay" id="completeOverlay">
+    <section class="modal" role="dialog" aria-modal="true"
+      aria-labelledby="completeTitle">
+      <div class="modal-icon">✦</div>
+      <h2 id="completeTitle">Task completed?</h2>
+      <p id="confirmTask">
+        Are you really finished with this task? Take a moment to reflect.
+      </p>
+
+      <div class="satisfaction-label">
+        How satisfied are you with your work?
+      </div>
+
+      <div class="rating-row" id="ratingRow">
+        <button class="rating" data-rating="1" aria-label="1 out of 5">1</button>
+        <button class="rating" data-rating="2" aria-label="2 out of 5">2</button>
+        <button class="rating" data-rating="3" aria-label="3 out of 5">3</button>
+        <button class="rating" data-rating="4" aria-label="4 out of 5">4</button>
+        <button class="rating" data-rating="5" aria-label="5 out of 5">5</button>
+      </div>
+
+      <div class="rating-caption" id="ratingCaption">
+        Choose your satisfaction level
+      </div>
+
+      <div class="modal-actions">
+        <button class="secondary-btn" id="cancelComplete">Not yet</button>
+        <button class="primary-btn" id="confirmComplete" disabled>
+          Yes, complete!
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Daily results -->
+  <div class="overlay" id="reportOverlay">
+    <section class="modal" role="dialog" aria-modal="true"
+      aria-labelledby="reportTitle">
+      <div class="modal-icon">🏆</div>
+      <div class="eyebrow">Your daily report</div>
+      <h2 id="reportTitle">You showed up today.</h2>
+      <p id="reportDate"></p>
+
+      <div class="rank" id="rankValue">C</div>
+      <p id="rankMessage"></p>
+
+      <div class="report-line">
+        <span>Tasks completed</span>
+        <strong id="reportCompleted">0 / 0</strong>
+      </div>
+      <div class="report-line">
+        <span>Performance score</span>
+        <strong id="reportScore">0%</strong>
+      </div>
+      <div class="report-line">
+        <span>Average satisfaction</span>
+        <strong id="reportSatisfaction">—</strong>
+      </div>
+      <div class="report-line">
+        <span>Total rating points</span>
+        <strong id="reportPoints">0 / 75 pts</strong>
+      </div>
+      <div class="report-line">
+        <span>Study-time equivalent</span>
+        <strong id="reportStudyTime">0 min / 12.5 hrs</strong>
+      </div>
+
+      <div class="report-progress">
+        <div class="metric-heading">
+          <span>Rating points progress</span>
+          <span class="muted" id="reportPointsPercent">0%</span>
+        </div>
+        <div class="metric-track" role="progressbar" aria-label="Report rating points progress"
+          aria-valuemin="0" aria-valuemax="75" aria-valuenow="0" id="reportPointsBar">
+          <div class="metric-fill" id="reportPointsFill"></div>
+        </div>
+        <div class="metric-heading" style="margin-top:15px">
+          <span>Study-time progress</span>
+          <span class="muted" id="reportStudyPercent">0%</span>
+        </div>
+        <div class="metric-track" role="progressbar" aria-label="Report study-time progress"
+          aria-valuemin="0" aria-valuemax="750" aria-valuenow="0" id="reportStudyBar">
+          <div class="metric-fill" id="reportStudyFill"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="primary-btn" id="closeReport">Keep going</button>
+      </div>
+      <p style="font-size:11px">
+        Your rank is based on your personal performance today, not a
+        comparison with other people.
+      </p>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "daylight_todo_v1";
+
+    const ratingLabels = {
+      1: "Not satisfied yet",
+      2: "A little satisfied",
+      3: "Fairly satisfied",
+      4: "Very satisfied",
+      5: "Extremely satisfied"
+    };
+
+    const $ = id => document.getElementById(id);
+
+    let data;
+    let completingId = null;
+    let selectedRating = 0;
+    let reportIsOpen = false;
+
+    function localDayKey(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function freshDay(day = localDayKey()) {
+      return {
+        day,
+        tasks: [],
+        reportShownDate: null,
+        resetDate: null,
+        lastReport: null
+      };
+    }
+
+    function loadData() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved && Array.isArray(saved.tasks) && saved.day) {
+          return saved;
+        }
+      } catch (error) {
+        console.warn("Could not load saved tasks.", error);
+      }
+      return freshDay();
+    }
+
+    function saveData() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (error) {
+        alert("Your browser could not save changes. Check browser storage.");
+      }
+    }
+
+    function completedTasks() {
+      return data.tasks.filter(task => task.completed);
+    }
+
+    function averageSatisfaction() {
+      const finished = completedTasks();
+      if (!finished.length) return null;
+
+      return finished.reduce((sum, task) => sum + task.satisfaction, 0)
+        / finished.length;
+    }
+
+    function totalRatingPoints() {
+      return completedTasks().reduce((sum, task) => sum + (Number(task.satisfaction) || 0), 0);
+    }
+
+    function studyMinutesEquivalent() {
+      // One satisfaction point represents 10 minutes; 75 points = 750 minutes = 12.5 hours.
+      return totalRatingPoints() * 10;
+    }
+
+    function formatStudyTime(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      if (hours === 0) return `${remainingMinutes} min`;
+      if (remainingMinutes === 0) return `${hours} hr`;
+      return `${hours} hr ${remainingMinutes} min`;
+    }
+
+    function performanceScore() {
+      const total = data.tasks.length;
+      if (!total) return 0;
+
+      const completionRate = completedTasks().length / total;
+      const avg = averageSatisfaction() || 0;
+      const satisfactionRate = avg / 5;
+
+      // Completion contributes 70%; satisfaction contributes 30%.
+      return Math.round(
+        (completionRate * 70) + (satisfactionRate * 30)
+      );
+    }
+
+    function getRank(score) {
+      if (score >= 90) return {
+        rank: "S",
+        message: "Outstanding! You gave today's goals real attention."
+      };
+      if (score >= 75) return {
+        rank: "A",
+        message: "Excellent work. You're building a strong routine."
+      };
+      if (score >= 50) return {
+        rank: "B",
+        message: "Good progress. Small steps are adding up."
+      };
+      return {
+        rank: "C",
+        message: "Every attempt counts. Tomorrow is another opportunity."
+      };
+    }
+
+    function updateStats() {
+      const total = data.tasks.length;
+      const done = completedTasks().length;
+      const score = performanceScore();
+      const avg = averageSatisfaction();
+
+      $("completedStat").textContent = `${done}/${total}`;
+      $("scoreStat").textContent = `${score}%`;
+      $("satisfactionStat").textContent =
+        avg === null ? "—" : `${avg.toFixed(1)}/5`;
+
+      const progress = total ? Math.round(done / total * 100) : 0;
+      $("progressFill").style.width = `${progress}%`;
+      $("progressText").textContent = `${progress}% complete`;
+      $("taskCount").textContent = `${total} of 15 tasks`;
+
+      const points = totalRatingPoints();
+      const studyMinutes = studyMinutesEquivalent();
+      const pointsPercent = Math.round(points / 75 * 100);
+      const studyPercent = Math.round(studyMinutes / 750 * 100);
+
+      $("pointsProgressText").textContent = `${points} / 75`;
+      $("pointsValue").textContent = `${points} / 75 pts`;
+      $("pointsProgressFill").style.width = `${pointsPercent}%`;
+      $("pointsProgressBar").setAttribute("aria-valuenow", points);
+
+      $("studyProgressText").textContent = `${studyPercent}%`;
+      $("studyTimeValue").textContent = `${formatStudyTime(studyMinutes)} / 12.5 hrs`;
+      $("studyProgressFill").style.width = `${studyPercent}%`;
+      $("studyProgressBar").setAttribute("aria-valuenow", studyMinutes);
+
+      $("addBtn").disabled = total >= 15;
+      $("taskInput").disabled = total >= 15;
+
+      $("addHint").textContent = total >= 15
+        ? "You've reached today's 15-task limit."
+        : `${15 - total} task${15 - total === 1 ? "" : "s"} remaining today.`;
+
+      const next = data.tasks.find(task => !task.completed);
+
+      if (!total) {
+        $("motivation").textContent =
+          "Start with one meaningful task. You have this.";
+      } else if (done === total) {
+        $("motivation").textContent =
+          "You completed every task. Take a moment to be proud.";
+      } else {
+        $("motivation").textContent =
+          `Keep going. Your next focus: ${next.text}`;
+      }
+    }
+
+    function renderTasks() {
+      const list = $("taskList");
+      list.innerHTML = "";
+
+      if (!data.tasks.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent =
+          "Your day starts here ✦ Add your first task below.";
+        list.appendChild(empty);
+        updateStats();
+        return;
+      }
+
+      data.tasks.forEach((task, index) => {
+        const isNext = !task.completed &&
+          !data.tasks.slice(0, index).some(item => !item.completed);
+
+        const card = document.createElement("article");
+        card.className = "task" +
+          (task.completed ? " completed" : "") +
+          (isNext ? " active" : "");
+
+        const number = document.createElement("div");
+        number.className = "task-number";
+        number.textContent = task.completed ? "✓" : String(index + 1);
+
+        const content = document.createElement("div");
+        content.className = "task-content";
+
+        const name = document.createElement("div");
+        name.className = "task-name";
+        name.textContent = task.text;
+
+        const note = document.createElement("div");
+        note.className = "task-note";
+        note.textContent = task.completed
+          ? `Completed · Satisfaction ${task.satisfaction}/5`
+          : isNext ? "YOUR NEXT FOCUS ✦" : "Up next";
+
+        content.append(name, note);
+
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
+        if (!task.completed) {
+          const edit = document.createElement("button");
+          edit.className = "small-btn";
+          edit.textContent = "Edit";
+          edit.setAttribute("aria-label", `Edit ${task.text}`);
+          edit.addEventListener("click", () => editTask(task.id));
+
+          const complete = document.createElement("button");
+          complete.className = "small-btn complete-btn";
+          complete.textContent = "✓";
+          complete.setAttribute("aria-label", `Complete ${task.text}`);
+          complete.title = "Mark task complete";
+          complete.addEventListener("click", () => openCompletion(task.id));
+
+          actions.append(edit, complete);
+        }
+
+        card.append(number, content, actions);
+        list.appendChild(card);
+      });
+
+      updateStats();
+    }
+
+    $("addForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      const text = $("taskInput").value.trim();
+      if (!text || data.tasks.length >= 15) return;
+
+      data.tasks.push({
+        id: Date.now().toString() + Math.random().toString(36).slice(2, 7),
+        text,
+        completed: false,
+        satisfaction: null
+      });
+
+      $("taskInput").value = "";
+      saveData();
+      renderTasks();
+    });
+
+    function editTask(id) {
+      const task = data.tasks.find(item => item.id === id);
+      if (!task || task.completed) return;
+
+      const newText = prompt("Edit your task:", task.text);
+      if (newText === null) return;
+
+      if (!newText.trim()) {
+        alert("A task cannot be empty.");
+        return;
+      }
+
+      task.text = newText.trim().slice(0, 140);
+      saveData();
+      renderTasks();
+    }
+
+    function openCompletion(id) {
+      const task = data.tasks.find(item => item.id === id);
+      if (!task || task.completed) return;
+
+      completingId = id;
+      selectedRating = 0;
+      $("confirmTask").textContent =
+        `Are you really finished with "${task.text}"? ` +
+        "Choose your satisfaction level before confirming.";
+
+      $("ratingCaption").textContent = "Choose your satisfaction level";
+      $("confirmComplete").disabled = true;
+
+      document.querySelectorAll(".rating").forEach(button => {
+        button.classList.remove("selected");
+      });
+
+      $("completeOverlay").classList.add("show");
+    }
+
+    $("ratingRow").addEventListener("click", event => {
+      const button = event.target.closest("[data-rating]");
+      if (!button) return;
+
+      selectedRating = Number(button.dataset.rating);
+
+      document.querySelectorAll(".rating").forEach(item => {
+        item.classList.toggle(
+          "selected",
+          Number(item.dataset.rating) === selectedRating
+        );
+      });
+
+      $("ratingCaption").textContent = ratingLabels[selectedRating];
+      $("confirmComplete").disabled = false;
+    });
+
+    function closeCompletion() {
+      $("completeOverlay").classList.remove("show");
+      completingId = null;
+      selectedRating = 0;
+    }
+
+    $("cancelComplete").addEventListener("click", closeCompletion);
+
+    $("confirmComplete").addEventListener("click", () => {
+      if (!completingId || !selectedRating) return;
+
+      const task = data.tasks.find(item => item.id === completingId);
+      if (!task || task.completed) {
+        closeCompletion();
+        return;
+      }
+
+      task.completed = true;
+      task.satisfaction = selectedRating;
+      task.completedAt = new Date().toISOString();
+
+      saveData();
+      closeCompletion();
+      renderTasks();
+    });
+
+    $("completeOverlay").addEventListener("click", event => {
+      if (event.target === $("completeOverlay")) closeCompletion();
+    });
+
+    function buildReport() {
+      const finished = completedTasks();
+      const avg = averageSatisfaction();
+      const score = performanceScore();
+      const result = getRank(score);
+
+      return {
+        day: data.day,
+        total: data.tasks.length,
+        completed: finished.length,
+        score,
+        satisfaction: avg === null ? null : Number(avg.toFixed(1)),
+        ratingPoints: totalRatingPoints(),
+        studyMinutes: studyMinutesEquivalent(),
+        rank: result.rank,
+        message: result.message
+      };
+    }
+
+    function showReport(report = buildReport()) {
+      $("reportDate").textContent = new Date(
+        `${report.day}T12:00:00`
+      ).toLocaleDateString(undefined, {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+
+      $("rankValue").textContent = report.rank;
+      $("rankMessage").textContent = report.message;
+      $("reportCompleted").textContent =
+        `${report.completed} / ${report.total}`;
+      $("reportScore").textContent = `${report.score}%`;
+      $("reportSatisfaction").textContent =
+        report.satisfaction === null
+          ? "No ratings yet"
+          : `${report.satisfaction}/5`;
+
+      const points = Number(report.ratingPoints) || 0;
+      const studyMinutes = Number(report.studyMinutes) || points * 10;
+      const pointsPercent = Math.round(Math.min(points, 75) / 75 * 100);
+      const studyPercent = Math.round(Math.min(studyMinutes, 750) / 750 * 100);
+
+      $("reportPoints").textContent = `${points} / 75 pts`;
+      $("reportStudyTime").textContent = `${formatStudyTime(studyMinutes)} / 12.5 hrs`;
+      $("reportPointsPercent").textContent = `${pointsPercent}%`;
+      $("reportPointsFill").style.width = `${pointsPercent}%`;
+      $("reportPointsBar").setAttribute("aria-valuenow", Math.min(points, 75));
+      $("reportStudyPercent").textContent = `${studyPercent}%`;
+      $("reportStudyFill").style.width = `${studyPercent}%`;
+      $("reportStudyBar").setAttribute("aria-valuenow", Math.min(studyMinutes, 750));
+
+      $("reportOverlay").classList.add("show");
+      reportIsOpen = true;
+    }
+
+    $("closeReport").addEventListener("click", () => {
+      $("reportOverlay").classList.remove("show");
+      reportIsOpen = false;
+    });
+
+    $("reportOverlay").addEventListener("click", event => {
+      if (event.target === $("reportOverlay")) {
+        $("reportOverlay").classList.remove("show");
+        reportIsOpen = false;
+      }
+    });
+
+    function archiveReport() {
+      if (data.reportShownDate === data.day) return;
+
+      data.lastReport = buildReport();
+      data.reportShownDate = data.day;
+      saveData();
+      showReport(data.lastReport);
+    }
+
+    function resetForToday(today) {
+      // Preserve yesterday's results before starting a new day.
+      if (!data.lastReport || data.lastReport.day !== data.day) {
+        data.lastReport = buildReport();
+      }
+
+      data = freshDay(today);
+      data.lastReport = JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || "{}"
+      ).lastReport || data.lastReport;
+      data.resetDate = today;
+
+      saveData();
+      renderTasks();
+    }
+
+    function handleClock() {
+      const now = new Date();
+      const today = localDayKey(now);
+      const minutes = now.getHours() * 60 + now.getMinutes();
+
+      $("dateDisplay").textContent = now.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      });
+
+      if (data.day !== today) {
+        // If the page was closed overnight, save the previous day's result.
+        if (!data.lastReport || data.lastReport.day !== data.day) {
+          data.lastReport = buildReport();
+        }
+        data = freshDay(today);
+        saveData();
+        renderTasks();
+      }
+
+      // At 10:00 PM, show the day's report once.
+      if (minutes >= 22 * 60 && minutes < 22 * 60 + 5) {
+        if (data.reportShownDate !== today) {
+          archiveReport();
+        }
+      }
+
+      // At 10:05 PM, clear the tasks for a fresh round.
+      if (minutes >= 22 * 60 + 5 && data.resetDate !== today) {
+        const lastReport = data.lastReport &&
+          data.lastReport.day === today
+          ? data.lastReport
+          : buildReport();
+
+        data = freshDay(today);
+        data.lastReport = lastReport;
+        data.resetDate = today;
+        saveData();
+        renderTasks();
+
+        $("reportOverlay").classList.remove("show");
+        reportIsOpen = false;
+      }
+    }
+
+    // Load saved tasks and keep the clock rules updated.
+    data = loadData();
+
+    if (data.day !== localDayKey()) {
+      if (!data.lastReport || data.lastReport.day !== data.day) {
+        data.lastReport = buildReport();
+      }
+
+      const previousReport = data.lastReport;
+      data = freshDay();
+      data.lastReport = previousReport;
+      saveData();
+    }
+
+    renderTasks();
+    handleClock();
+    setInterval(handleClock, 1000);
+  </script>
+</body>
+</html>
